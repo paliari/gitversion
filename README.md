@@ -4,12 +4,15 @@ gitversion
 Versionamento automatico do git
 
 Exemplos:
+
 Gerando uma nova release
 
 ```bash 
 
 $ gitversion r
- 
+
+Return:
+
 $ start 0.1.0
 $ Switched to a new branch 'release/0.1.0'
 $ 
@@ -51,3 +54,29 @@ $ - Release branch 'release/0.1.0' has been deleted
 
 ```
 
+Gerando um novo hotfix:
+
+```bash 
+
+$ gitv h start
+
+Return
+
+$ start 0.1.1
+$ Switched to a new branch 'hotfix/0.1.1'
+
+$ Summary of actions:
+$ - A new branch 'hotfix/0.1.1' was created, based on 'master'
+$ - You are now on branch 'hotfix/0.1.1'
+
+$ Follow-up actions:
+$ - Bump the version number now!
+$ - Start committing your hot fixes
+$ - When done, run:
+
+$      git flow hotfix finish '0.1.1'
+
+$ Or:
+$  gitv h finish
+
+```
