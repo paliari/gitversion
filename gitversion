@@ -1,0 +1,53 @@
+#!/usr/bin/env php
+<?php
+error_reporting(E_ALL);
+ini_set('display_errors','On');
+
+$path = getcwd();
+$file = "$path/VERSION";
+
+if (file_exists($file)) {
+	$version = file_get_contents($file);
+}
+$version = @$version ? $version : '0.0.0';
+list($v, $r, $h) = explode('.', $version);
+
+$flow = @$argv[1];
+if ('r'==$flow) {
+	$r = (int)$r;
+	$r++;
+	$h = 0;
+	$version = "$v.$r.$h";
+	$data = $version;
+
+	$msg = '@rel ' . @$argv[2];
+	echo "start $version\n";
+	echo shell_exec("git flow release start $version");
+	file_put_contents($file, $data);
+	echo "finish $version\n";
+	echo shell_exec("git add . && git commit -a -m '$msg' && git flow release finish -m '@rel-$version' $version");
+
+} elseif ('h'==$flow) {
+	$action = @$argv[2];
+	if ('start'==$action) {
+		$h = (int)$h;
+		$h++;
+		$version = "$v.$r.$h";
+		echo "start $version\n";
+		$data = $version;
+		echo shell_exec("git flow hotfix start $version");
+
+		file_put_contents($file, $data);
+		echo "Or:\n\tgitv h finish\n\n";
+
+	} elseif ('finish'==$action) {
+		$msg = '@fix ' . @$argv[3];
+		echo "finish $version\n";
+		echo shell_exec("git add . && git commit -a -m '$msg'");
+		echo shell_exec("git flow hotfix finish -m '@fix-$version' $version");
+	} else {
+		echo "Error: informe a ação start ou finish\n";
+	}
+} else {
+	echo "Error: informe o tipo de flow r para release ou h para hotfix\n";
+}
