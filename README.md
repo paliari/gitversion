@@ -1,18 +1,22 @@
-gitversion
+# Git Version
 ==========
 
-Versionamento automatico do git
+# Versionamento automatico do Git
 
-Exemplos:
+## Dependence:
+git-flow
 
-Gerando uma nova release
+## Exemplos:
+
+### Gerando uma nova release
 
 ```bash 
-
 $ gitversion r
+```
 
-Return:
+#### O comando acima retorna algo parecido com:
 
+```bash
 $ start 0.1.0
 $ Switched to a new branch 'release/0.1.0'
 $ 
@@ -54,14 +58,15 @@ $ - Release branch 'release/0.1.0' has been deleted
 
 ```
 
-Gerando um novo hotfix:
+### Iniciando um novo hotfix:
 
 ```bash 
+$ gitversion h start
+```
 
-$ gitv h start
+#### O Comando acima retorna algo parecido com:
 
-Return
-
+```bash 
 $ start 0.1.1
 $ Switched to a new branch 'hotfix/0.1.1'
 
@@ -79,4 +84,33 @@ $      git flow hotfix finish '0.1.1'
 $ Or:
 $  gitv h finish
 
+```
+
+### Finalizando um novo hotfix:
+
+```bash
+$ gitversion h finish
+```
+#### O Comando acima retorna algo parecido com:
+
+```bash
+$ finish 0.1.1
+$ [hotfix/0.1.1 87dfead] @fix
+$  1 file changed, 1 insertion(+), 1 deletion(-)
+$ Switched to branch 'master'
+$ Switched to branch 'develop'
+$ Merge made by the 'recursive' strategy.
+$  VERSION | 2 +-
+$  1 file changed, 1 insertion(+), 1 deletion(-)
+$ Merge made by the 'recursive' strategy.
+$  VERSION | 2 +-
+$  1 file changed, 1 insertion(+), 1 deletion(-)
+$ Deleted branch hotfix/0.1.1 (was 87dfead).
+$ 
+$ Summary of actions:
+$ - Latest objects have been fetched from 'origin'
+$ - Hotfix branch has been merged into 'master'
+$ - The hotfix was tagged 'v0.1.1'
+$ - Hotfix branch has been back-merged into 'develop'
+$ - Hotfix branch 'hotfix/0.1.1' has been deleted
 ```
