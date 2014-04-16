@@ -30,8 +30,8 @@ if ('r'==$flow) {
 } elseif ('h'==$flow) {
 	$action = @$argv[2];
 	if ('start'==$action) {
-		$h = (int)$h;
-		$h++;
+		@list($h, $t) = explode('_', $h);
+		$h .= '_' . time();
 		$version = "$v.$r.$h";
 		echo "start $version\n";
 		$data = $version;
