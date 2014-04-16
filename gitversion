@@ -5,10 +5,12 @@ ini_set('display_errors','On');
 
 $path = getcwd();
 $file = "$path/VERSION";
+$file_time = "$path/VERSION_TIME";
 
 if (file_exists($file)) {
 	$version = file_get_contents($file);
 }
+
 $version = @$version ? $version : '0.0.0';
 list($v, $r, $h) = explode('.', $version);
 
@@ -30,18 +32,21 @@ if ('r'==$flow) {
 } elseif ('h'==$flow) {
 	$action = @$argv[2];
 	if ('start'==$action) {
-		@list($h, $t) = explode('_', $h);
-		$h .= '_' . time();
-		$version = "$v.$r.$h";
+		//@list($h) = explode('_', $h);
+		$time = time();
+		$version = $data = "$v.$r.$h";
+		$version .= ".$time";
 		echo "start $version\n";
-		$data = $version;
 		echo shell_exec("git flow hotfix start $version");
 
 		file_put_contents($file, $data);
+		file_put_contents($file_time, $time);
 		echo "Or:\n\tgitv h finish\n\n";
 
 	} elseif ('finish'==$action) {
 		$msg = '@fix ' . @$argv[3];
+    	$time = @file_get_contents($file_time);
+    	$version .= ".$time";
 		echo "finish $version\n";
 		echo shell_exec("git add . && git commit -a -m '$msg'");
 		echo shell_exec("git flow hotfix finish -m '@fix-$version' $version");
