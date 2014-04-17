@@ -3,51 +3,69 @@
 error_reporting(E_ALL);
 ini_set('display_errors','On');
 
-$path = getcwd();
-$file = "$path/VERSION";
+require_once __DIR__ . "/functions.php";
 
-if (file_exists($file)) {
-	$version = file_get_contents($file);
+
+$version = getLastTag();
+echo $version;
+
+list($v, $r, $h) = extractVersion($version);
+
+@list($script, $flow, $action, $msg) = $argv;
+
+if ('s' == $action) {
+    $action = 'start';
 }
-$version = @$version ? $version : '0.0.0';
-list($v, $r, $h) = explode('.', $version);
+if ('f' == $action) {
+    $action = 'finish';
+}
 
-$flow = @$argv[1];
 if ('r'==$flow) {
 	$r = (int)$r;
 	$r++;
 	$h = 0;
-	$version = "$v.$r.$h";
-	$data = $version;
 
-	$msg = '@rel ' . @$argv[2];
-	echo "start $version\n";
-	echo shell_exec("git flow release start $version");
-	file_put_contents($file, $data);
-	echo "finish $version\n";
-	echo shell_exec("git add . && git commit -a -m '$msg' && git flow release finish -m '@rel-$version' $version");
+	$version = concatVersion($v, $r, $h);
+	$msg = '@rel ' . $msg;
+
+    startRelease($version);
+
+    finishRelease($version, $msg);
 
 } elseif ('h'==$flow) {
-	$action = @$argv[2];
 	if ('start'==$action) {
 		$h = (int)$h;
 		$h++;
-		$version = "$v.$r.$h";
-		echo "start $version\n";
-		$data = $version;
-		echo shell_exec("git flow hotfix start $version");
+		$version = concatVersion($v, $r, $h);
 
-		file_put_contents($file, $data);
+		startHotFix($version);
+
 		echo "Or:\n\tgitv h finish\n\n";
 
 	} elseif ('finish'==$action) {
-		$msg = '@fix ' . @$argv[3];
-		echo "finish $version\n";
-		echo shell_exec("git add . && git commit -a -m '$msg'");
-		echo shell_exec("git flow hotfix finish -m '@fix-$version' $version");
+		$msg = '@fix ' . $msg;
+    	$version = getCurrentHotFix();
+		finishHotFix($version, $msg);
+	} else {
+		echo "Error: informe a ação start ou finish\n";
+	}
+} elseif ('b'==$flow) {
+	if ('start'==$action) {
+		$time = getTime();
+		$version = concatVersion($v, $r, $h, $time);
+
+		startHotFix($version);
+
+		echo "Or:\n\tgitv b finish\n\n";
+
+	} elseif ('finish'==$action) {
+		$msg = '@fix ' . $msg;
+    	$version = getCurrentHotFix();
+
+		finishHotFix($version, $msg);
 	} else {
 		echo "Error: informe a ação start ou finish\n";
 	}
 } else {
-	echo "Error: informe o tipo de flow r para release ou h para hotfix\n";
+	echo "Error: informe o tipo de flow r para RELEASE, b para BUILD ou h para HOTFIX\n";
 }
