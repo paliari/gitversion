@@ -22,8 +22,11 @@ function extractVersion($version)
     return array($v, $r, $h, $b);
 }
 
-function concatVersion($v, $r, $h, $b = null)
+function concatVersion($v, $r = 0, $h = 0, $b = null)
 {
+    if (is_array($v)) {
+        @list($v, $r, $h, $b) = $v;
+    }
     $version = implode(VERSION_SEPARATOR, array($v, $r, $h));
     if ($b) {
         $version .= BUILD_SEPARATOR . "$b";
@@ -77,9 +80,33 @@ function finishRelease($version, $msg)
 function getLastTag()
 {
     $cmd = 'git tag';
-    $v = shell_exec($cmd);
-    $v = trim($v, PHP_EOL);
-    $v = explode(PHP_EOL, $v);
+    $tags = shell_exec($cmd);
+    $tags = trim($tags, PHP_EOL);
+    if (!$tags) {
+        return concatVersion(0, 0, 0);
+    }
+    $tags = explode(PHP_EOL, $tags);
+    $tags = _sortTags($tags);
+    $tag = end($tags);
+    $tag = extractVersion($tag);
+    foreach ($tag as $k => $v) {
+        $tag[$k] = (int)$v;
+    }
+    $tag = concatVersion($tag);
 
-    return end($v) ?: concatVersion(0, 0, 0);
+    return $tag;
+}
+
+function _sortTags($tags)
+{
+    foreach ($tags as $k => $tag) {
+        $tag = extractVersion($tag);
+        foreach ($tag as $i => $v) {
+            $tag[$i] = str_pad($v, 4, '0', STR_PAD_LEFT);
+        }
+        $tags[$k] = concatVersion($tag);
+    }
+    sort($tags);
+
+    return $tags;
 }

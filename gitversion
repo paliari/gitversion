@@ -7,6 +7,7 @@ require_once __DIR__ . "/functions.php";
 
 
 $version = getLastTag();
+echo $version;
 
 list($v, $r, $h) = extractVersion($version);
 
